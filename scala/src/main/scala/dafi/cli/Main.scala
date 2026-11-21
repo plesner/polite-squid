@@ -4,8 +4,10 @@ import dafi.ctfs.CtfsBundle
 import dafi.steps.{PipelineOptions, ReadStopsOptions, Steps}
 import scopt.OParser
 
+import java.io.FileOutputStream
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{Files, Path}
+import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 case class Options(
     input: Option[String] = None,
@@ -47,11 +49,14 @@ class Main(args: Array[String]):
     val pipeline = Steps.builder(stepsOptions).newPipeline
     val bundle = pipeline.step[CtfsBundle].get()
     val sections = bundle.buildSections()
-    val rootPath = opts.output.get
-    Files.createDirectories(Path.of(rootPath))
+    val output = opts.output.get
+    val zipOut = new ZipOutputStream(new FileOutputStream(output))
     for section <- sections do
-      val fullPath = Path.of(rootPath, section.path)
-      Files.write(fullPath, section.toByteArray)
+      val entry = new ZipEntry(section.path)
+      zipOut.putNextEntry(entry)
+      zipOut.write(section.toByteArray)
+      zipOut.closeEntry()
+    zipOut.close()
 
 def main(args: Array[String]): Unit =
   new Main(args).main()
