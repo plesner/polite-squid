@@ -10,9 +10,13 @@ fi
 
 "$EMPLUSPLUS" \
   -lembind \
+  -sJSPI \
+  -og \
   -Icpp/src \
-  -I$FLATBUFS_ROOT/include/ \
-  -o web/src/gen/wasm/engine.mjs \
+  -I"$FLATBUFS_ROOT/include/" \
+  -o engine/src/wasm/engine.mjs \
   --no-entry \
   --emit-tsd engine.d.ts \
-  cpp/src/bindings.cc
+  cpp/src/wasm/bindings.cc cpp/src/wasm/workloop.cc cpp/src/wasm/connection.cc
+
+mv engine/src/wasm/engine.d.ts engine/src/wasm/engine.d.mts

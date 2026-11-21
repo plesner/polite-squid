@@ -1,6 +1,5 @@
-import createModule from "../gen/wasm/engine";
-import type { MainModule, EngineConnection, WorkLoop } from "../gen/wasm/engine";
-import { createContext } from "react";
+import createModule from "./wasm/engine.mjs";
+import type { MainModule, EngineConnection, WorkLoop } from "./wasm/engine.mjs";
 import { ZipReader, Uint8ArrayReader, type FileEntry, Uint8ArrayWriter } from "@zip.js/zip.js";
 
 export interface EngineBridge {
@@ -87,8 +86,6 @@ export class Engine {
   }
 
 }
-
-export const EngineContext = createContext<EngineFactory>(null!);
 
 export async function createEngineFactory() {
   const wasm = await createModule();

@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import "./App.css";
-import { CtfsEngineBridge, Engine, EngineContext, type EngineBridge } from "./engine/engine";
+import { CtfsEngineBridge, type Engine } from "@atob/engine";
+import { EngineContext } from "./engine/context";
 import { useEffect } from "react";
 
 function EngineOutput(params: { engine: Engine }) {

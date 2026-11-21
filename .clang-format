@@ -1,0 +1,6 @@
+BasedOnStyle: Google
+IndentWidth: 2
+TabWidth: 8
+UseTab: Never
+ColumnLimit: 80
+NamespaceIndentation: None
