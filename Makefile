@@ -38,8 +38,12 @@ web-dev:
 test-scala:
 	cd projects/scala && sbt test
 
+.PHONY: test-engine-npm
+test-engine-npm:
+	cd $(ENGINE_NPM) && npm test
+
 .PHONY: test
-test: test-scala
+test: test-scala test-engine-npm
 
 .PHONY: all
 all: test-scala build-web

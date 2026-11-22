@@ -13,13 +13,14 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsc && mkdir -p dist/wasm && cp src/wasm/engine.mjs src/wasm/engine.wasm src/wasm/engine.d.mts dist/wasm/",
-    "test": "npm run build && node --test test/*.test.mjs",
+    "test": "npm run build && tsc -p tsconfig.test.json && node --test test-dist/*.test.js",
     "prepare": "npm run build"
   },
   "dependencies": {
     "@zip.js/zip.js": "2.23.0"
   },
   "devDependencies": {
+    "@types/node": "^24.13.3",
     "typescript": "~6.0.2"
   }
 }

@@ -648,10 +648,6 @@ async function instantiateAsync(binary, binaryFile, imports) {
 }
 
 function getWasmImports() {
-  // instrumenting imports is used in asyncify in two ways: to add assertions
-  // that check for proper import use, and for JSPI we use them to set up
-  // the Promise API on the import side.
-  Asyncify.instrumentWasmImports(wasmImports);
   // prepare imports
   var imports = {
     'env': wasmImports,
@@ -668,8 +664,6 @@ async function createWasm() {
   // performing other necessary setup
   function receiveInstance(instance) {
     wasmExports = instance.exports;
-
-    wasmExports = Asyncify.instrumentWasmExports(wasmExports);
 
     assignWasmExports(wasmExports);
 
@@ -1741,21 +1735,18 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       if (!func) {
         /** @suppress {checkTypes} */
         wasmTableMirror[funcPtr] = func = wasmTable.get(funcPtr);
-        if (Asyncify.isAsyncExport(func)) {
-          wasmTableMirror[funcPtr] = func = Asyncify.makeAsyncFunction(func);
-        }
       }
+      /** @suppress {checkTypes} */
+      assert(wasmTable.get(funcPtr) == func, 'table mirror is out of date');
       return func;
     };
   var embind__requireFunction = (signature, rawFunction, isAsync = false) => {
+      assert(!isAsync, 'async bindings are only supported with JSPI');
   
       signature = AsciiToString(signature);
   
       function makeDynCaller() {
         var rtn = getWasmTableEntry(rawFunction);
-        if (isAsync) {
-          rtn = WebAssembly.promising(rtn);
-        }
         return rtn;
       }
   
@@ -2025,7 +2016,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       invokerFnBody += (returns || isAsync ? 'var rv = ' : '') + `invoker(${argsListWired});\n`;
   
       var returnVal = returns ? 'rv' : '';
-      invokerFnBody += `function onDone(${returnVal}) {\n`;
   
       if (needsDestructorStack) {
         invokerFnBody += 'runDestructors(destructors);\n';
@@ -2044,9 +2034,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
                          'return ret;\n';
       } else {
       }
-  
-      invokerFnBody += '}\n';
-      invokerFnBody += 'return ' + (isAsync ? 'rv.then(onDone)' : `onDone(${returnVal})`) + ';';
   
       invokerFnBody += '}\n';
   
@@ -2082,6 +2069,7 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
         throwBindingError('argTypes array size mismatch! Must at least get return value and receiver (this) types!');
       }
   
+      assert(!isAsync, 'async bindings are only supported with JSPI');
       var isClassMethodFunc = (argTypes[1] !== null && classType !== null);
   
       // Free functions with signature "void function()" do not need an invoker that marshalls between wire types.
@@ -2929,146 +2917,6 @@ Originally allocated`); // `.stack` will add "at ..." after this sentence
       HEAPU32[((pnum)>>2)] = num;
       return 0;
     };
-
-  var runAndAbortIfError = (func) => {
-      try {
-        return func();
-      } catch (e) {
-        abort(e);
-      }
-    };
-  
-  var handleException = (e) => {
-      // Certain exception types we do not treat as errors since they are used for
-      // internal control flow.
-      // 1. ExitStatus, which is thrown by exit()
-      // 2. "unwind", which is thrown by emscripten_unwind_to_js_event_loop() and others
-      //    that wish to return to JS event loop.
-      if (e instanceof ExitStatus || e == 'unwind') {
-        return EXITSTATUS;
-      }
-      checkStackCookie();
-      if (e instanceof WebAssembly.RuntimeError) {
-        if (_emscripten_stack_get_current() <= 0) {
-          err('Stack overflow detected.  You can try increasing -sSTACK_SIZE (currently set to 65536)');
-        }
-      }
-      quit_(1, e);
-    };
-  
-  
-  var runtimeKeepaliveCounter = 0;
-  var keepRuntimeAlive = () => noExitRuntime || runtimeKeepaliveCounter > 0;
-  var _proc_exit = (code) => {
-      EXITSTATUS = code;
-      if (!keepRuntimeAlive()) {
-        Module['onExit']?.(code);
-        ABORT = true;
-      }
-      quit_(code, new ExitStatus(code));
-    };
-  
-  
-  /** @param {boolean|number=} implicit */
-  var exitJS = (status, implicit) => {
-      EXITSTATUS = status;
-  
-      checkUnflushedContent();
-  
-      // if exit() was called explicitly, warn the user if the runtime isn't actually being shut down
-      if (keepRuntimeAlive() && !implicit) {
-        var msg = `program exited (with status: ${status}), but keepRuntimeAlive() is set (counter=${runtimeKeepaliveCounter}) due to an async operation, so halting execution but not exiting the runtime or preventing further async execution (you can use emscripten_force_exit, if you want to force a true shutdown)`;
-        err(msg);
-      }
-  
-      _proc_exit(status);
-    };
-  var _exit = exitJS;
-  
-  
-  var maybeExit = () => {
-      if (!keepRuntimeAlive()) {
-        try {
-          _exit(EXITSTATUS);
-        } catch (e) {
-          handleException(e);
-        }
-      }
-    };
-  var callUserCallback = (func) => {
-      if (ABORT) {
-        err('user callback triggered after runtime exited or application aborted.  Ignoring.');
-        return;
-      }
-      try {
-        return func();
-      } catch (e) {
-        handleException(e);
-      } finally {
-        maybeExit();
-      }
-    };
-  
-  
-  var runtimeKeepalivePush = () => {
-      runtimeKeepaliveCounter += 1;
-    };
-  
-  var runtimeKeepalivePop = () => {
-      assert(runtimeKeepaliveCounter > 0);
-      runtimeKeepaliveCounter -= 1;
-    };
-  var Asyncify = {
-  instrumentWasmImports(imports) {
-        assert('Suspending' in WebAssembly, 'JSPI not supported by current environment. Perhaps it needs to be enabled via flags?');
-        var importPattern = /^(invoke_.*|__asyncjs__.*)$/;
-  
-        for (let [x, original] of Object.entries(imports)) {
-          if (typeof original == 'function') {
-            let isAsyncifyImport = original.isAsync || importPattern.test(x);
-            // Wrap async imports with a suspending WebAssembly function.
-            if (isAsyncifyImport) {
-              imports[x] = original = new WebAssembly.Suspending(original);
-            }
-          }
-        }
-      },
-  instrumentWasmExports(exports) {
-        var exportPattern = /^(main|__main_argc_argv)$/;
-        Asyncify.asyncExports = new Set();
-        var ret = {};
-        for (let [x, original] of Object.entries(exports)) {
-          if (typeof original == 'function') {
-            // Wrap all exports with a promising WebAssembly function.
-            let isAsyncifyExport = exportPattern.test(x);
-            if (isAsyncifyExport) {
-              Asyncify.asyncExports.add(original);
-              original = Asyncify.makeAsyncFunction(original);
-            }
-            ret[x] = original;
-          } else {
-            ret[x] = original;
-          }
-        }
-        return ret;
-      },
-  asyncExports:null,
-  isAsyncExport(func) {
-        return Asyncify.asyncExports?.has(func);
-      },
-  handleAsync:async (startAsync) => {
-        
-        try {
-          return await startAsync();
-        } finally {
-          
-        }
-      },
-  handleSleep:(startAsync) => Asyncify.handleAsync(() => new Promise(startAsync)),
-  makeAsyncFunction(original) {
-        return WebAssembly.promising(original);
-      },
-  };
 init_ClassHandle();
 init_RegisteredPointer();
 assert(emval_handles.length === 5 * 2);
@@ -3139,6 +2987,7 @@ Module['FS_createPreloadedFile'] = FS.createPreloadedFile;
   'getTempRet0',
   'setTempRet0',
   'zeroMemory',
+  'exitJS',
   'getHeapMax',
   'growMemory',
   'withStackSave',
@@ -3155,6 +3004,12 @@ Module['FS_createPreloadedFile'] = FS.createPreloadedFile;
   'autoResumeAudioContext',
   'getDynCaller',
   'dynCall',
+  'handleException',
+  'keepRuntimeAlive',
+  'runtimeKeepalivePush',
+  'runtimeKeepalivePop',
+  'callUserCallback',
+  'maybeExit',
   'asyncLoad',
   'asmjsMangle',
   'alignMemory',
@@ -3289,6 +3144,7 @@ Module['FS_createPreloadedFile'] = FS.createPreloadedFile;
   '__glGetActiveAttribOrUniform',
   'writeGLArray',
   'registerWebGlEventCallback',
+  'runAndAbortIfError',
   'writeStringToMemory',
   'writeAsciiToMemory',
   'allocateUTF8',
@@ -3340,7 +3196,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'stackRestore',
   'createNamedFunction',
   'ptrToString',
-  'exitJS',
   'abortOnCannotGrowMemory',
   'ENV',
   'ERRNO_CODES',
@@ -3350,12 +3205,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'timers',
   'warnOnce',
   'readEmAsmArgsArray',
-  'handleException',
-  'keepRuntimeAlive',
-  'runtimeKeepalivePush',
-  'runtimeKeepalivePop',
-  'callUserCallback',
-  'maybeExit',
   'wasmTable',
   'wasmMemory',
   'noExitRuntime',
@@ -3531,9 +3380,6 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'EGL',
   'GLEW',
   'IDBStore',
-  'runAndAbortIfError',
-  'Asyncify',
-  'Fibers',
   'SDL',
   'SDL_gfx',
   'print',
