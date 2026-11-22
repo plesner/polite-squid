@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { createEngineFactory, type EngineFactory } from "@atob/engine";
+import { createEngineFactory, type EngineFactory } from "@posqui/engine";
 import { EngineContext } from "./engine/context";
 
 createEngineFactory().then((factory) => {

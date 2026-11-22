@@ -1,4 +1,4 @@
-# Web app
+# Polite Squid web app
 
 Install the engine package's dependencies first, then install and build the app:
 
@@ -8,5 +8,5 @@ cd ../web && npm install
 npm run build
 ```
 
-The app uses the local `@atob/engine` package. After changing engine sources,
+The app uses the local `@posqui/engine` package. After changing engine sources,
 run `npm run build` in `engine` before building or running the app.

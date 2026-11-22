@@ -21,7 +21,7 @@ class Main(args: Array[String]):
   private val argParser =
     import builder.*
     OParser.sequence(
-      programName("dafi"),
+      programName("posqui"),
       cmd("gtfs")
         .action((_, c) => c.copy(handler = Some(handle_gtfs)))
         .children(

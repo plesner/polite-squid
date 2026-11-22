@@ -1,4 +1,4 @@
-# @atob/engine
+# @posqui/engine
 
 The engine package contains the WebAssembly module, its generated bindings, and
 the TypeScript API (`Engine`, `EngineFactory`, `createEngineFactory`,
