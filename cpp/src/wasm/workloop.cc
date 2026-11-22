@@ -2,7 +2,7 @@
 
 #include <emscripten/console.h>
 
-using namespace dafi;
+using namespace pasqui;
 
 JsWorkLoop::~JsWorkLoop() {}
 

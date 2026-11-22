@@ -4,7 +4,7 @@
 
 #include "connection.hh"
 
-using namespace dafi;
+using namespace pasqui;
 using namespace emscripten;
 
 EMSCRIPTEN_BINDINGS(module) {

@@ -1,4 +1,4 @@
-package dafi.geo
+package pasqui.geo
 
 class ZQuadTest extends munit.FunSuite:
 

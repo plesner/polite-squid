@@ -1,4 +1,4 @@
-namespace dafi.flatbuf;
+namespace pasqui.flatbuf;
 
 table ManifestRequestMessage {
   name: string;

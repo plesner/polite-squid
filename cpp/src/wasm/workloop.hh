@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace dafi {
+namespace pasqui {
 
 class JsWorkLoop;
 
@@ -44,4 +44,4 @@ class JsWorkLoop {
   virtual JsWorkLoopEvent* proceed() = 0;
 };
 
-}  // namespace dafi
+}  // namespace pasqui

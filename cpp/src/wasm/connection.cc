@@ -3,7 +3,7 @@
 #include <emscripten/console.h>
 
 using namespace emscripten;
-using namespace dafi;
+using namespace pasqui;
 
 std::shared_ptr<std::string> JsEngineConnection::section(
     const std::string& name) {
@@ -37,10 +37,10 @@ JsWorkLoopEvent* OpenConnectionWorkLoop::proceed() {
     return new JsGetSectionEvent(this, "manifest.sec");
   }
 
-  const dafi::flatbuf::BundleSection* manifest_section =
-      flatbuffers::GetRoot<dafi::flatbuf::BundleSection>(manifest->c_str());
+  const pasqui::flatbuf::BundleSection* manifest_section =
+      flatbuffers::GetRoot<pasqui::flatbuf::BundleSection>(manifest->c_str());
   if (manifest_section->contents_type() !=
-      dafi::flatbuf::BundleSectionContents_manifest) {
+      pasqui::flatbuf::BundleSectionContents_manifest) {
   }
 
   conn().set_manifest(manifest_section->contents_as_manifest());

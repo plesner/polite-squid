@@ -1,4 +1,4 @@
-namespace dafi.flatbuf;
+namespace pasqui.flatbuf;
 
 table IntRange {
   // The first value included in the interval.

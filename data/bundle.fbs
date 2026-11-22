@@ -1,7 +1,7 @@
 include "stops.fbs";
 include "utils.fbs";
 
-namespace dafi.flatbuf;
+namespace pasqui.flatbuf;
 
 enum EntityType: ubyte {
   STOP = 0

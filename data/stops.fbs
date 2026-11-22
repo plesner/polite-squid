@@ -1,6 +1,6 @@
 include "columns.fbs";
 
-namespace dafi.flatbuf;
+namespace pasqui.flatbuf;
 
 enum StopAttrib: ubyte {
   DESCENDANCY = 0,

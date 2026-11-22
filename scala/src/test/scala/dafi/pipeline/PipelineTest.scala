@@ -1,4 +1,4 @@
-package dafi.pipeline
+package pasqui.pipeline
 
 private case class A()
 private case class B(a: A)
