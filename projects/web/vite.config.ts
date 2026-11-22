@@ -9,7 +9,7 @@ export default defineConfig({
     fs: {
       allow: [
         searchForWorkspaceRoot(fileURLToPath(new URL('.', import.meta.url))),
-        fileURLToPath(new URL('../engine', import.meta.url)),
+        fileURLToPath(new URL('../engine-npm', import.meta.url)),
       ],
     },
   },

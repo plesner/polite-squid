@@ -3,10 +3,10 @@
 Install the engine package's dependencies first, then install and build the app:
 
 ```sh
-cd engine && npm install
+cd projects/engine-npm && npm install
 cd ../web && npm install
 npm run build
 ```
 
 The app uses the local `@posqui/engine` package. After changing engine sources,
-run `npm run build` in `engine` before building or running the app.
+run `npm run build` in `projects/engine-npm` before building or running the app.

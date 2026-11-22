@@ -1,25 +1,25 @@
 BINDIR=out
-CPP_BINDIR=$(BINDIR)/cpp
-ENGINE_WASM=$(CPP_BINDIR)/engine.wasm
-ENGINE_WASM_ROOT=engine/src/wasm
+ENGINE_CORE_BINDIR=$(BINDIR)/engine-core
+ENGINE_CORE=projects/engine-core
+ENGINE_NPM=projects/engine-npm
+WEB=projects/web
+ENGINE_WASM_ROOT=$(ENGINE_NPM)/src/wasm
 
 cmake:
-	mkdir -p $(CPP_BINDIR)
-	cd $(CPP_BINDIR) && emcmake cmake ../../cpp
+	mkdir -p $(ENGINE_CORE_BINDIR)
+	cd $(ENGINE_CORE_BINDIR) && emcmake cmake ../../$(ENGINE_CORE)
 
-.PHONY: $(CPP_BINDIR)/engine.wasm
-$(CPP_BINDIR)/engine.wasm:
-	make -C $(CPP_BINDIR)
+.PHONY: cmake build-engine-core build-cpp build-web
+build-engine-core: cmake
+	$(MAKE) -C $(ENGINE_CORE_BINDIR)
 
-$(ENGINE_WASM_ROOT)/engine.wasm: $(CPP_BINDIR)/engine.wasm
+$(ENGINE_WASM_ROOT)/engine.mjs: build-engine-core
 	mkdir -p $(ENGINE_WASM_ROOT)
-	cp $(CPP_BINDIR)/engine.mjs $(CPP_BINDIR)/engine.wasm $(ENGINE_WASM_ROOT)/
-	cp $(CPP_BINDIR)/engine.d.ts $(ENGINE_WASM_ROOT)/engine.d.mts
+	cp $(ENGINE_CORE_BINDIR)/engine.mjs $(ENGINE_CORE_BINDIR)/engine.wasm $(ENGINE_WASM_ROOT)/
+	cp $(ENGINE_CORE_BINDIR)/engine.d.ts $(ENGINE_WASM_ROOT)/engine.d.mts
 
-.PHONY: build-cpp
-build-cpp: $(CPP_BINDIR)/engine.wasm
+build-cpp: build-engine-core
 
-.PHONY: build-web
-build-web: $(ENGINE_WASM_ROOT)/engine.wasm
-	cd engine && npm run build
-	cd web && npm run build
+build-web: $(ENGINE_WASM_ROOT)/engine.mjs
+	cd $(ENGINE_NPM) && npm run build
+	cd $(WEB) && npm run build

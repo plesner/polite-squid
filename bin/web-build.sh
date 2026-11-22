@@ -1,2 +1,2 @@
-cd web
+cd projects/web
 npm run build

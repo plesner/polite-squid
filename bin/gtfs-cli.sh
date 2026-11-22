@@ -1,4 +1,4 @@
 #!/bin/bash -e
 
-cd scala
+cd projects/scala
 sbt "run gtfs $(printf "%q " "$@")"

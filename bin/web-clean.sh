@@ -1,1 +1,1 @@
-rm -rf web/dist web/node_modules
+rm -rf projects/web/dist projects/web/node_modules

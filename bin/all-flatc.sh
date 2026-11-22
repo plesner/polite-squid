@@ -10,11 +10,10 @@ data/stops.fbs
 data/utils.fbs
 """
 
-rm -rf engine/src/gen/flatbuf
-$FLATBUFS_ROOT/flatc -o cpp/src/gen/flatbuf --cpp $ALL_FILES
+$FLATBUFS_ROOT/flatc -o projects/engine-core/src/gen/flatbuf --cpp $ALL_FILES
 
-rm -rf web/src/gen/flatbuf
-$FLATBUFS_ROOT/flatc -o web/src/gen/flatbuf --ts $ALL_FILES --gen-all
+rm -rf projects/web/src/gen/flatbuf
+$FLATBUFS_ROOT/flatc -o projects/web/src/gen/flatbuf --ts $ALL_FILES --gen-all
 
-rm -rf scala/src/main/java/
-$FLATBUFS_ROOT/flatc -o scala/src/main/java/ --java $ALL_FILES
+rm -rf projects/scala/src/main/java/
+$FLATBUFS_ROOT/flatc -o projects/scala/src/main/java/ --java $ALL_FILES

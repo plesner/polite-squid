@@ -12,11 +12,11 @@ fi
   -lembind \
   -sJSPI \
   -og \
-  -Icpp/src \
+  -Iprojects/engine-core/src \
   -I"$FLATBUFS_ROOT/include/" \
-  -o engine/src/wasm/engine.mjs \
+  -o projects/engine-npm/src/wasm/engine.mjs \
   --no-entry \
   --emit-tsd engine.d.ts \
-  cpp/src/wasm/bindings.cc cpp/src/wasm/workloop.cc cpp/src/wasm/connection.cc
+  projects/engine-core/src/wasm/bindings.cc projects/engine-core/src/wasm/workloop.cc projects/engine-core/src/wasm/connection.cc
 
-mv engine/src/wasm/engine.d.ts engine/src/wasm/engine.d.mts
+mv projects/engine-npm/src/wasm/engine.d.ts projects/engine-npm/src/wasm/engine.d.mts
