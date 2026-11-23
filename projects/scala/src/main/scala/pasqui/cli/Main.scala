@@ -44,7 +44,7 @@ class Main(args: Array[String]):
       PipelineOptions(
         gtfsPath = opts.input.get,
         readStops =
-          ReadStopsOptions().copy(idRegex = "^0*(?<id>[1-9][0-9]*)G*$")
+          ReadStopsOptions().copy()
       )
     val pipeline = Steps.builder(stepsOptions).newPipeline
     val bundle = pipeline.step[CtfsBundle].get()

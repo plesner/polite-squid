@@ -15,7 +15,7 @@ export interface ClassHandle {
 export interface WorkLoopEventTypeValue<T extends number> {
   value: T;
 }
-export type WorkLoopEventType = WorkLoopEventTypeValue<2>|WorkLoopEventTypeValue<1>;
+export type WorkLoopEventType = WorkLoopEventTypeValue<0>|WorkLoopEventTypeValue<2>|WorkLoopEventTypeValue<1>;
 
 export interface EngineConnection extends ClassHandle {
   putSection(_0: EmbindString, _1: EmbindString): void;
@@ -33,7 +33,7 @@ export interface WorkLoopEvent extends ClassHandle {
 }
 
 interface EmbindModule {
-  WorkLoopEventType: {COMPLETE: WorkLoopEventTypeValue<2>, GET_SECTION: WorkLoopEventTypeValue<1>};
+  WorkLoopEventType: {ERROR: WorkLoopEventTypeValue<0>, COMPLETE: WorkLoopEventTypeValue<2>, GET_SECTION: WorkLoopEventTypeValue<1>};
   EngineConnection: {
     new(): EngineConnection;
   };

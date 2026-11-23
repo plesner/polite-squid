@@ -9,6 +9,7 @@ using namespace emscripten;
 
 EMSCRIPTEN_BINDINGS(module) {
   enum_<JsWorkLoopEventType>("WorkLoopEventType")
+      .value("ERROR", ERROR)
       .value("COMPLETE", COMPLETE)
       .value("GET_SECTION", GET_SECTION);
   class_<JsEngineConnection>("EngineConnection")

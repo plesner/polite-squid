@@ -73,6 +73,9 @@ export class Engine {
       if (eventType == this.wasm.WorkLoopEventType.COMPLETE) {
         console.log("  Received complete event:", nextEvent);
         keepGoing = false;
+      } else if (eventType == this.wasm.WorkLoopEventType.ERROR) {
+        console.log("  Received error event:", nextEvent);
+        keepGoing = false;
       } else if (eventType == this.wasm.WorkLoopEventType.GET_SECTION) {
         const sectionName = nextEvent.stringValue();
         console.log(`  Received get section event for ${sectionName}:`, nextEvent);

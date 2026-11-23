@@ -6,7 +6,7 @@ namespace pasqui {
 
 class JsWorkLoop;
 
-enum JsWorkLoopEventType { GET_SECTION = 1, COMPLETE = 2 };
+enum JsWorkLoopEventType { ERROR = 0, GET_SECTION = 1, COMPLETE = 2 };
 
 class JsWorkLoopEvent {
  public:
@@ -23,6 +23,11 @@ class JsWorkLoopEvent {
 class JsCompleteEvent : public JsWorkLoopEvent {
  public:
   JsCompleteEvent() : JsWorkLoopEvent(COMPLETE) {}
+};
+
+class JsErrorEvent : public JsWorkLoopEvent {
+ public:
+  JsErrorEvent() : JsWorkLoopEvent(ERROR) {}
 };
 
 class JsGetSectionEvent : public JsWorkLoopEvent {
